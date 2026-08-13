@@ -107,7 +107,7 @@ export default function Home() {
         <section className="bg-slate-950 px-6 py-20 text-white">
           <div className="mx-auto max-w-7xl">
             <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-rose-400">
-              Hospedajes en México
+              Hospedajes aquí en México
             </p>
 
             <h1 className="max-w-3xl text-4xl font-bold md:text-6xl">
