@@ -53,5 +53,17 @@ export async function createCheckoutSessionAction(formData: FormData) {
     throw new Error("Stripe no devolvió una URL de pago");
   }
 
+  // Se crea "pendiente" ANTES de redirigir a Stripe -- así queda un
+  // registro aunque el usuario abandone el pago. /reserva/exito la marca
+  // "pagada" al confirmar con Stripe (no hay webhook en esta versión
+  // sencilla, ver el comentario del modelo en schema.prisma).
+  await prisma.booking.create({
+    data: {
+      propertyId: property.id,
+      stripeSessionId: session.id,
+      monto: property.precio,
+    },
+  });
+
   redirect(session.url);
 }
