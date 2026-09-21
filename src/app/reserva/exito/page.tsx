@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import prisma from "@/lib/prisma";
-import stripe from "@/lib/stripe";
+import { getStripe } from "@/lib/stripe";
 
 type ExitoPageProps = {
   searchParams: Promise<{ session_id?: string }>;
@@ -13,7 +13,7 @@ export default async function ReservaExitoPage({ searchParams }: ExitoPageProps)
     notFound();
   }
 
-  const session = await stripe.checkout.sessions.retrieve(sessionId, {
+  const session = await getStripe().checkout.sessions.retrieve(sessionId, {
     expand: ["line_items"],
   });
 
