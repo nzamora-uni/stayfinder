@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
-import stripe from "@/lib/stripe";
+import { getStripe } from "@/lib/stripe";
 
 // Pasarela de pagos sencilla: una sesión de Stripe Checkout (hospedada por
 // Stripe, no un formulario de tarjeta propio) por reserva. No requiere la
@@ -27,7 +27,7 @@ export async function createCheckoutSessionAction(formData: FormData) {
     throw new Error("NEXT_PUBLIC_APP_URL no está configurada");
   }
 
-  const session = await stripe.checkout.sessions.create({
+  const session = await getStripe().checkout.sessions.create({
     mode: "payment",
     line_items: [
       {
