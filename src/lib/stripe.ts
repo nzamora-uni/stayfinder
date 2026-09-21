@@ -14,10 +14,18 @@ function createStripeClient() {
   return new Stripe(secretKey);
 }
 
-const stripe = globalForStripe.stripe ?? createStripeClient();
+// Lazy on purpose -- creating (and validating) this eagerly at module load
+// broke `next build` on Vercel: "Collecting page data" imports every route
+// module just to inspect it, which doesn't need STRIPE_SECRET_KEY to be
+// set, but importing this file used to construct the client (and throw)
+// immediately regardless. Only the first actual call -- a real request --
+// needs the env var to exist.
+export function getStripe(): Stripe {
+  const stripe = globalForStripe.stripe ?? createStripeClient();
 
-if (process.env.NODE_ENV !== "production") {
-  globalForStripe.stripe = stripe;
+  if (process.env.NODE_ENV !== "production") {
+    globalForStripe.stripe = stripe;
+  }
+
+  return stripe;
 }
-
-export default stripe;
