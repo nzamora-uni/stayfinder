@@ -8,7 +8,7 @@ export function AlojamientosCatalogo({
 }) {
   return (
     <section className="mx-auto max-w-7xl px-6 py-14">
-      <div className="flex items-end justify-between gap-4">
+      <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h2 className="text-3xl font-bold">Alojamientos recomendados</h2>
 
@@ -19,7 +19,7 @@ export function AlojamientosCatalogo({
 
         <select
           aria-label="Ordenar alojamientos"
-          className="rounded-lg border border-slate-300 px-4 py-2"
+          className="w-full rounded-lg border border-slate-300 px-4 py-2 sm:w-auto"
         >
           <option>Recomendados</option>
           <option>Menor precio</option>
