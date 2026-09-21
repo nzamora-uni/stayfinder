@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import prisma from "@/lib/prisma";
+import { createCheckoutSessionAction } from "./actions";
 
 type PropertyPageProps = {
   params: Promise<{
@@ -78,6 +79,16 @@ export default async function PropertyPage({
           </p>
 
           <p className="text-slate-600">por noche</p>
+
+          <form action={createCheckoutSessionAction} className="mt-6">
+            <input type="hidden" name="propertyId" value={alojamiento.id} />
+            <button
+              type="submit"
+              className="w-full rounded-lg bg-rose-600 px-4 py-3 font-semibold text-white transition-colors hover:bg-rose-700"
+            >
+              Reservar y pagar
+            </button>
+          </form>
         </aside>
       </div>
     </main>

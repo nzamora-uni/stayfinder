@@ -24,6 +24,13 @@ This project uses [`next/font`](https://nextjs.org/docs/app/building-your-applic
 npx prisma migrate dev
 
 npx prisma db seed
+
+## Environment variables
+
+See `.env.example`. `DATABASE_URL` is required for Prisma; `STRIPE_SECRET_KEY` and
+`NEXT_PUBLIC_APP_URL` are required for the "Reservar y pagar" checkout flow (Stripe Checkout,
+test mode) -- without them, `createCheckoutSessionAction` throws instead of silently failing.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
