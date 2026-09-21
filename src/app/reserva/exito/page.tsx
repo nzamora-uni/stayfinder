@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import prisma from "@/lib/prisma";
 import stripe from "@/lib/stripe";
 
 type ExitoPageProps = {
@@ -23,6 +24,24 @@ export default async function ReservaExitoPage({ searchParams }: ExitoPageProps)
     ? (session.amount_total / 100).toLocaleString("es-MX")
     : null;
 
+  // Marca la reserva creada en createCheckoutSessionAction como "pagada".
+  // updateMany (no update) porque no debe tronar si por algún motivo no
+  // existe una Booking para este session_id -- y es seguro llamarlo dos
+  // veces si el usuario recarga esta página.
+  if (pagada) {
+    await prisma.booking.updateMany({
+      where: { stripeSessionId: sessionId, status: "pendiente" },
+      data: {
+        status: "pagada",
+        guestEmail: session.customer_details?.email ?? undefined,
+      },
+    });
+  }
+
+  const booking = await prisma.booking.findUnique({
+    where: { stripeSessionId: sessionId },
+  });
+
   return (
     <main className="mx-auto flex min-h-screen max-w-2xl flex-col items-center justify-center px-6 text-center">
       {pagada ? (
@@ -32,6 +51,11 @@ export default async function ReservaExitoPage({ searchParams }: ExitoPageProps)
             Tu reserva de <strong>{titulo}</strong> quedó registrada.
             {total && <> Se cobraron ${total} MXN.</>}
           </p>
+          {booking && (
+            <p className="mt-2 text-sm text-slate-400">
+              Número de reserva: #{booking.id}
+            </p>
+          )}
         </>
       ) : (
         <>

@@ -25,4 +25,33 @@ model Property {
   amenidades   String[]
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+
+  bookings Booking[]
+}
+
+enum BookingStatus {
+  pendiente
+  pagada
+}
+
+// Una fila por intento de pago: se crea con status "pendiente" al mismo
+// tiempo que la Stripe Checkout Session (antes de redirigir), y
+// /reserva/exito la marca "pagada" al confirmar payment_status con Stripe.
+// No hay webhook (pasarela "sencilla", ver proposal/design) -- una sesión
+// que el usuario abandona se queda "pendiente" para siempre, no hay
+// expiración automática.
+model Booking {
+  id              Int           @id @default(autoincrement())
+  propertyId      Int
+  property        Property      @relation(fields: [propertyId], references: [id])
+  stripeSessionId String        @unique
+  // Snapshot del precio al momento de reservar -- Property.precio puede
+  // cambiar después, la reserva no debe cambiar de monto con él.
+  monto           Int
+  status          BookingStatus @default(pendiente)
+  guestEmail      String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@index([propertyId])
 }
