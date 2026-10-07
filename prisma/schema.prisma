@@ -34,24 +34,38 @@ enum BookingStatus {
   pagada
 }
 
+// Qué pasarela procesó (o está procesando) este intento de pago -- decide
+// cuál de stripeSessionId/mercadopagoPreferenceId está poblado y cuál queda
+// null (exactamente uno de los dos, nunca ambos ni ninguno).
+enum MetodoPago {
+  stripe
+  mercadopago
+}
+
 // Una fila por intento de pago: se crea con status "pendiente" al mismo
-// tiempo que la Stripe Checkout Session (antes de redirigir), y
-// /reserva/exito la marca "pagada" al confirmar payment_status con Stripe.
-// No hay webhook (pasarela "sencilla", ver proposal/design) -- una sesión
+// tiempo que la Stripe Checkout Session o la preference de Mercado Pago
+// (antes de redirigir), y la página de éxito correspondiente la marca
+// "pagada" al confirmar el estado real con la API de la pasarela. No hay
+// webhook (pasarela "sencilla", ver proposal/design) -- una sesión/preference
 // que el usuario abandona se queda "pendiente" para siempre, no hay
 // expiración automática.
 model Booking {
-  id              Int           @id @default(autoincrement())
-  propertyId      Int
-  property        Property      @relation(fields: [propertyId], references: [id])
-  stripeSessionId String        @unique
+  id         Int        @id @default(autoincrement())
+  propertyId Int
+  property   Property   @relation(fields: [propertyId], references: [id])
+  metodoPago MetodoPago @default(stripe)
+  // Exactamente uno de estos dos está poblado, según metodoPago --
+  // @unique en vez de @@unique([metodoPago, xSessionId]) porque cada
+  // pasarela ya garantiza unicidad global de sus propios ids.
+  stripeSessionId        String?       @unique
+  mercadopagoPreferenceId String?      @unique
   // Snapshot del precio al momento de reservar -- Property.precio puede
   // cambiar después, la reserva no debe cambiar de monto con él.
-  monto           Int
-  status          BookingStatus @default(pendiente)
-  guestEmail      String?
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+  monto      Int
+  status     BookingStatus @default(pendiente)
+  guestEmail String?
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
 
   @@index([propertyId])
 }

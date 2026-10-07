@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import prisma from "@/lib/prisma";
-import { createCheckoutSessionAction } from "./actions";
+import { createCheckoutSessionAction, createMercadoPagoPreferenceAction } from "./actions";
 
 type PropertyPageProps = {
   params: Promise<{
@@ -86,7 +86,17 @@ export default async function PropertyPage({
               type="submit"
               className="w-full rounded-lg bg-rose-600 px-4 py-3 font-semibold text-white transition-colors hover:bg-rose-700"
             >
-              Reservar y pagar
+              Reservar y pagar con tarjeta (Stripe)
+            </button>
+          </form>
+
+          <form action={createMercadoPagoPreferenceAction} className="mt-3">
+            <input type="hidden" name="propertyId" value={alojamiento.id} />
+            <button
+              type="submit"
+              className="w-full rounded-lg bg-sky-500 px-4 py-3 font-semibold text-white transition-colors hover:bg-sky-600"
+            >
+              Reservar y pagar con Mercado Pago
             </button>
           </form>
         </aside>
